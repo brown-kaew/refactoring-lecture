@@ -26,6 +26,7 @@ func TestFizzBuzz(t *testing.T) {
 		{input: 14, want: "14"},
 		{input: 15, want: "FizzBuzz"},
 		{input: 20, want: "Buzz"},
+		{input: 30, want: "FizzBuzz"},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%d should get %s", tt.input, tt.want), func(t *testing.T) {

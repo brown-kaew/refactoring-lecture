@@ -33,3 +33,14 @@ func TestFizzBuzz3ShouldGetFizz(t *testing.T) {
 		t.Errorf("FizzBuzz(1) = %q, want %q", got, want)
 	}
 }
+
+func TestFizzBuzz4ShouldGet4(t *testing.T) {
+	input := 4
+	want := "4"
+
+	got := FizzBuzz(input)
+
+	if got != want {
+		t.Errorf("FizzBuzz(1) = %q, want %q", got, want)
+	}
+}

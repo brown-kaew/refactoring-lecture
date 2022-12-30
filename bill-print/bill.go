@@ -22,7 +22,7 @@ type Invoice struct {
 	Performances []Performance `json:"performances"`
 }
 
-func calculateAmount(play Play, perf Performance) float64 {
+func amountFor(play Play, perf Performance) float64 {
 	result := 0.0
 	switch play.Type {
 	case "tragedy":
@@ -69,7 +69,7 @@ func totalVolumeCredits(invoice Invoice, plays Plays) float64 {
 func totalAmounts(invoice Invoice, plays Plays) float64 {
 	result := 0.0
 	for _, perf := range invoice.Performances {
-		result += calculateAmount(playFor(plays, perf), perf)
+		result += amountFor(playFor(plays, perf), perf)
 	}
 	return result
 }
@@ -78,7 +78,7 @@ func statement(invoice Invoice, plays Plays) string {
 	result := fmt.Sprintf("Statement for %s\n", invoice.Customer)
 	for _, perf := range invoice.Performances {
 		// print line for this order
-		result += fmt.Sprintf("  %s: $%.2f (%d seats)\n", playFor(plays, perf).Name, calculateAmount(playFor(plays, perf), perf)/100, perf.Audience)
+		result += fmt.Sprintf("  %s: $%.2f (%d seats)\n", playFor(plays, perf).Name, amountFor(playFor(plays, perf), perf)/100, perf.Audience)
 	}
 	result += fmt.Sprintf("Amount owed is $%.2f\n", totalAmounts(invoice, plays)/100)
 	result += fmt.Sprintf("you earned %.0f credits\n", totalVolumeCredits(invoice, plays))

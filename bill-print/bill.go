@@ -118,6 +118,20 @@ func renderPlainText(bill Bill) string {
 	return result
 }
 
+func renderHTML(bill Bill) string {
+	result := fmt.Sprintf("<h1>Statement for %s</h1>", bill.Customer)
+	result += "<table> "
+	result += "<tr><th>play</th><th>seats</th><th>cost</th></tr>"
+
+	for _, rate := range bill.Rates {
+		result += fmt.Sprintf("<tr><td>%s</td><td>%d</td><td>$%.2f</td></tr> ", rate.Play.Name, rate.Audience, rate.Amount/100)
+	}
+	result += "</table> "
+	result += fmt.Sprintf("<p>Amount owed is <em>$%.2f</em></p> ", bill.TotalAmounts/100)
+	result += fmt.Sprintf("<p>You earned <em>%.0f</em> credits</p> ", bill.TotalVolumeCredits)
+	return result
+}
+
 func main() {
 	inv := Invoice{
 		Customer: "Bigco",

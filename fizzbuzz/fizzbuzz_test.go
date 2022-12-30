@@ -1,46 +1,27 @@
 package fizzbuzz
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestFizzBuzz(t *testing.T) {
-	input := 1
-	want := "1"
-
-	got := FizzBuzz(input)
-
-	if got != want {
-		t.Errorf("FizzBuzz(1) = %q, want %q", got, want)
+	tests := []struct {
+		input int
+		want  string
+	}{
+		{input: 1, want: "1"},
+		{input: 2, want: "2"},
+		{input: 3, want: "Fizz"},
+		{input: 4, want: "4"},
 	}
-}
-func TestFizzBuzz2ShouldGet2(t *testing.T) {
-	input := 2
-	want := "2"
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%d should get %s", tt.input, tt.want), func(t *testing.T) {
+			got := FizzBuzz(tt.input)
 
-	got := FizzBuzz(input)
-
-	if got != want {
-		t.Errorf("FizzBuzz(1) = %q, want %q", got, want)
-	}
-}
-
-func TestFizzBuzz3ShouldGetFizz(t *testing.T) {
-	input := 3
-	want := "Fizz"
-
-	got := FizzBuzz(input)
-
-	if got != want {
-		t.Errorf("FizzBuzz(1) = %q, want %q", got, want)
-	}
-}
-
-func TestFizzBuzz4ShouldGet4(t *testing.T) {
-	input := 4
-	want := "4"
-
-	got := FizzBuzz(input)
-
-	if got != want {
-		t.Errorf("FizzBuzz(1) = %q, want %q", got, want)
+			if got != tt.want {
+				t.Errorf("got %q, but want %q", got, tt.want)
+			}
+		})
 	}
 }

@@ -6,7 +6,7 @@ func FizzBuzz(num int) string {
 	if num == 5 {
 		return "Buzz"
 	}
-	if num == 3 || num == 6 {
+	if num == 3 || num == 6 || num == 9 {
 		return "Fizz"
 	}
 

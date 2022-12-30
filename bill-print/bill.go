@@ -22,6 +22,27 @@ type Invoice struct {
 	Performances []Performance `json:"performances"`
 }
 
+func calculateAmount(play PlayDetails, perf Performance) float64 {
+	thisAmount := 0.0
+	switch play.Type {
+	case "tragedy":
+		thisAmount = 40000
+		if perf.Audience > 30 {
+			thisAmount += 1000 * (float64(perf.Audience - 30))
+		}
+	case "comedy":
+		thisAmount = 30000
+		if perf.Audience > 20 {
+			thisAmount += 10000 + 500*(float64(perf.Audience-20))
+		}
+		thisAmount += 300 * float64(perf.Audience)
+	default:
+		panic(fmt.Sprintf("unknow type: %s", play.Type))
+	}
+
+	return thisAmount
+}
+
 func statement(invoice Invoice, plays Play) string {
 	totalAmount := 0.0
 	volumeCredits := 0.0
@@ -29,23 +50,7 @@ func statement(invoice Invoice, plays Play) string {
 
 	for _, perf := range invoice.Performances {
 		play := plays[perf.PlayID]
-		thisAmount := 0.0
-
-		switch play.Type {
-		case "tragedy":
-			thisAmount = 40000
-			if perf.Audience > 30 {
-				thisAmount += 1000 * (float64(perf.Audience - 30))
-			}
-		case "comedy":
-			thisAmount = 30000
-			if perf.Audience > 20 {
-				thisAmount += 10000 + 500*(float64(perf.Audience-20))
-			}
-			thisAmount += 300 * float64(perf.Audience)
-		default:
-			panic(fmt.Sprintf("unknow type: %s", play.Type))
-		}
+		thisAmount := calculateAmount(play, perf)
 
 		// add volume credits
 		volumeCredits += math.Max(float64(perf.Audience-30), 0)

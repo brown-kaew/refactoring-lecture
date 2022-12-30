@@ -23,24 +23,24 @@ type Invoice struct {
 }
 
 func calculateAmount(play Play, perf Performance) float64 {
-	thisAmount := 0.0
+	result := 0.0
 	switch play.Type {
 	case "tragedy":
-		thisAmount = 40000
+		result = 40000
 		if perf.Audience > 30 {
-			thisAmount += 1000 * (float64(perf.Audience - 30))
+			result += 1000 * (float64(perf.Audience - 30))
 		}
 	case "comedy":
-		thisAmount = 30000
+		result = 30000
 		if perf.Audience > 20 {
-			thisAmount += 10000 + 500*(float64(perf.Audience-20))
+			result += 10000 + 500*(float64(perf.Audience-20))
 		}
-		thisAmount += 300 * float64(perf.Audience)
+		result += 300 * float64(perf.Audience)
 	default:
 		panic(fmt.Sprintf("unknow type: %s", play.Type))
 	}
 
-	return thisAmount
+	return result
 }
 
 func playFor(plays Plays, perf Performance) Play {
@@ -48,31 +48,30 @@ func playFor(plays Plays, perf Performance) Play {
 }
 
 func volumeCreditsFor(plays Plays, perf Performance) float64 {
-	volumeCredits := 0.0
+	result := 0.0
 	// add volume credits
-	volumeCredits += math.Max(float64(perf.Audience-30), 0)
+	result += math.Max(float64(perf.Audience-30), 0)
 	// add extra credit for every ten comedy attendees
 	if "comedy" == playFor(plays, perf).Type {
-		volumeCredits += math.Floor(float64(perf.Audience / 5))
+		result += math.Floor(float64(perf.Audience / 5))
 	}
-
-	return volumeCredits
+	return result
 }
 
 func totalVolumeCredits(invoice Invoice, plays Plays) float64 {
-	volumeCredits := 0.0
+	result := 0.0
 	for _, perf := range invoice.Performances {
-		volumeCredits += volumeCreditsFor(plays, perf)
+		result += volumeCreditsFor(plays, perf)
 	}
-	return volumeCredits
+	return result
 }
 
 func totalAmounts(invoice Invoice, plays Plays) float64 {
-	totalAmount := 0.0
+	result := 0.0
 	for _, perf := range invoice.Performances {
-		totalAmount += calculateAmount(playFor(plays, perf), perf)
+		result += calculateAmount(playFor(plays, perf), perf)
 	}
-	return totalAmount
+	return result
 }
 
 func statement(invoice Invoice, plays Plays) string {

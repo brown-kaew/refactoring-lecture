@@ -16,6 +16,7 @@ func NewCustomer(name string) Customer {
 func (rcvr Customer) AddRental(arg Rental) {
 	rcvr.rentals = append(rcvr.rentals, arg)
 }
+
 func (rcvr Customer) Name() string {
 	return rcvr.name
 }
@@ -39,6 +40,15 @@ func (rental Rental) Charge() float64 {
 	return result
 }
 
+func (rental Rental) GetPoint() int {
+	frequentRenterPoints := 0
+	frequentRenterPoints++
+	if rental.Movie().PriceCode() == NEW_RELEASE && rental.DaysRented() > 1 {
+		frequentRenterPoints++
+	}
+	return frequentRenterPoints
+}
+
 func (rcvr Customer) Statement() string {
 	totalAmount := 0.0
 	frequentRenterPoints := 0
@@ -46,10 +56,8 @@ func (rcvr Customer) Statement() string {
 	for _, rental := range rcvr.rentals {
 		thisAmount := rental.Charge()
 
-		frequentRenterPoints++
-		if rental.Movie().PriceCode() == NEW_RELEASE && rental.DaysRented() > 1 {
-			frequentRenterPoints++
-		}
+		frequentRenterPoints += rental.GetPoint()
+
 		result += fmt.Sprintf("\t%v\t%.1f\n", rental.Movie().Title(), thisAmount)
 		totalAmount += thisAmount
 	}

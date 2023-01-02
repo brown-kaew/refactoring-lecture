@@ -7,6 +7,18 @@ type Customer struct {
 	rentals []Rental
 }
 
+type Receipt struct {
+	name        string
+	points      int
+	totalAmount float64
+	details     []MovieDetails
+}
+
+type MovieDetails struct {
+	title  string
+	amount float64
+}
+
 func NewCustomer(name string) Customer {
 	return Customer{
 		name:    name,
@@ -64,15 +76,28 @@ func getTotalAmounts(rentals []Rental) float64 {
 }
 
 func (customer Customer) Statement() string {
-	frequentRenterPoints := getTotalPoints(customer.rentals)
-
-	totalAmount := getTotalAmounts(customer.rentals)
-
-	result := fmt.Sprintf("Rental Record for %v\n", customer.Name())
-	for _, rental := range customer.rentals {
-		result += fmt.Sprintf("\t%v\t%.1f\n", rental.Movie().Title(), rental.Charge())
+	receipt := Receipt{
+		name:        customer.name,
+		points:      getTotalPoints(customer.rentals),
+		totalAmount: getTotalAmounts(customer.rentals),
+		details:     []MovieDetails{},
 	}
-	result += fmt.Sprintf("Amount owed is %.1f\n", totalAmount)
-	result += fmt.Sprintf("You earned %v frequent renter points", frequentRenterPoints)
+
+	for _, rental := range customer.rentals {
+		receipt.details = append(receipt.details, MovieDetails{
+			title:  rental.Movie().Title(),
+			amount: rental.Charge(),
+		})
+	}
+	return renderPlainText(receipt)
+}
+
+func renderPlainText(receipt Receipt) string {
+	result := fmt.Sprintf("Rental Record for %v\n", receipt.name)
+	for _, d := range receipt.details {
+		result += fmt.Sprintf("\t%v\t%.1f\n", d.title, d.amount)
+	}
+	result += fmt.Sprintf("Amount owed is %.1f\n", receipt.totalAmount)
+	result += fmt.Sprintf("You earned %v frequent renter points", receipt.points)
 	return result
 }

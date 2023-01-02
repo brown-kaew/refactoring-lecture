@@ -22,7 +22,7 @@ func (rcvr Customer) Name() string {
 func (rcvr Customer) Statement() string {
 	totalAmount := 0.0
 	frequentRenterPoints := 0
-	result := fmt.Sprintf("%v%v%v", "Rental Record for ", rcvr.Name(), "\n")
+	result := fmt.Sprintf("Rental Record for %v\n", rcvr.Name())
 	for _, each := range rcvr.rentals {
 		thisAmount := 0.0
 		switch each.Movie().PriceCode() {
@@ -43,10 +43,10 @@ func (rcvr Customer) Statement() string {
 		if each.Movie().PriceCode() == NEW_RELEASE && each.DaysRented() > 1 {
 			frequentRenterPoints++
 		}
-		result += fmt.Sprintf("%v%v%v%.1f%v", "\t", each.Movie().Title(), "\t", thisAmount, "\n")
+		result += fmt.Sprintf("\t%v\t%.1f\n", each.Movie().Title(), thisAmount)
 		totalAmount += thisAmount
 	}
-	result += fmt.Sprintf("%v%.1f%v", "Amount owed is ", totalAmount, "\n")
-	result += fmt.Sprintf("%v%v%v", "You earned ", frequentRenterPoints, " frequent renter points")
+	result += fmt.Sprintf("Amount owed is %.1f\n", totalAmount)
+	result += fmt.Sprintf("You earned %v frequent renter points", frequentRenterPoints)
 	return result
 }

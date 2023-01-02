@@ -2,9 +2,17 @@ package db
 
 import "github.com/brown-kaew/refactoring-lecture/db-store/pb"
 
+type Storage interface {
+	Set(entity *pb.Entity) error
+	Delete(key string) error
+	Get(key string) (*pb.Entity, error)
+	Recover() error
+	Len() int
+}
+
 // Service provides all database methods
 type Service struct {
-	db                *DB
+	db                Storage
 	SetRequestChannel chan *SetRequest
 }
 
@@ -16,7 +24,7 @@ type SetRequest struct {
 }
 
 // NewService creates a new db-service based on the given db reference
-func NewService(db *DB) *Service {
+func NewService(db Storage) *Service {
 	c := make(chan *SetRequest)
 	service := &Service{db: db, SetRequestChannel: c}
 

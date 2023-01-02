@@ -2,29 +2,31 @@ package db
 
 import (
 	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 
 	"github.com/brown-kaew/refactoring-lecture/db-store/pb"
 )
 
-func setup(t *testing.T) (string, func()) {
+func setup(t *testing.T) (*os.File, func()) {
 	t.Parallel()
-	dir, err := os.MkdirTemp("", "dbstore")
+	f, err := os.CreateTemp("", "dbstore")
 	if err != nil {
-		t.Fatalf("error creating temp dir: %v", err)
+		t.Fatalf("error creating temp file: %v", err)
 	}
 
-	teardown := func() { os.RemoveAll(dir) }
+	teardown := func() {
+		f.Close()
+		os.Remove(f.Name())
+	}
 
-	return filepath.Join(dir, "testdb"), teardown
+	return f, teardown
 }
 
 func TestSingleGet(t *testing.T) {
-	testdb, teardown := setup(t)
+	file, teardown := setup(t)
 	defer teardown()
-	db := NewDB(testdb)
+	db := New(file)
 	key := "foo-key"
 	value := "foo-value"
 	entity := &pb.Entity{Tombstone: false, Key: key, Value: []byte(value)}
@@ -42,9 +44,9 @@ func TestSingleGet(t *testing.T) {
 }
 
 func TestMultipleGet(t *testing.T) {
-	testdb, teardown := setup(t)
+	file, teardown := setup(t)
 	defer teardown()
-	db := NewDB(testdb)
+	db := New(file)
 	key := "foo-key"
 	value := "foo-value"
 	entity := &pb.Entity{Tombstone: false, Key: key, Value: []byte(value)}
@@ -74,9 +76,9 @@ func TestMultipleGet(t *testing.T) {
 
 func TestSingleDelete(t *testing.T) {
 	// prepare
-	testdb, teardown := setup(t)
+	file, teardown := setup(t)
 	defer teardown()
-	db := NewDB(testdb)
+	db := New(file)
 	key := "foo-key"
 	value := "foo-value"
 	entity := &pb.Entity{Tombstone: false, Key: key, Value: []byte(value)}
@@ -93,9 +95,9 @@ func TestSingleDelete(t *testing.T) {
 
 func TestSingleRecover(t *testing.T) {
 	// prepare
-	testdb, teardown := setup(t)
+	file, teardown := setup(t)
 	defer teardown()
-	db := NewDB(testdb)
+	db := New(file)
 	key := "foo-key"
 	value := "foo-value"
 	entity := &pb.Entity{Tombstone: false, Key: key, Value: []byte(value)}
@@ -124,9 +126,9 @@ func TestSingleRecover(t *testing.T) {
 
 func TestSingleRecoverWithDelete(t *testing.T) {
 	// prepare
-	testdb, teardown := setup(t)
+	file, teardown := setup(t)
 	defer teardown()
-	db := NewDB(testdb)
+	db := New(file)
 	key := "foo-key"
 	value := "foo-value"
 	entity := &pb.Entity{Tombstone: false, Key: key, Value: []byte(value)}
@@ -155,9 +157,9 @@ func TestSingleRecoverWithDelete(t *testing.T) {
 }
 
 func TestMultipleRecover(t *testing.T) {
-	testdb, teardown := setup(t)
+	file, teardown := setup(t)
 	defer teardown()
-	db := NewDB(testdb)
+	db := New(file)
 
 	// first item
 	key := "foo-key"

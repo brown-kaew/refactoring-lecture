@@ -13,20 +13,13 @@ import (
 )
 
 // Db type
-type Db struct {
+type DB struct {
 	f         io.ReadWriteSeeker
 	offsetMap map[string]int64
 }
 
-// NewDB return a new intialized Db
-func NewDB(filename string) *Db {
-	f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		log.Fatalf("error file opening for write")
-	}
-	offsetMap := make(map[string]int64)
-	db := &Db{f: f, offsetMap: offsetMap}
-	return db
+func New(f *os.File) *DB {
+	return &DB{f: f, offsetMap: make(map[string]int64)}
 }
 
 func writeBinaryBufferLength(data []byte) *bytes.Buffer {
@@ -39,7 +32,7 @@ func writeBinaryBufferLength(data []byte) *bytes.Buffer {
 	return buf
 }
 
-func (db *Db) pbAppend(entity *pb.Entity) (int64, error) {
+func (db *DB) pbAppend(entity *pb.Entity) (int64, error) {
 	entityBytes, err := proto.Marshal(entity)
 	if err != nil {
 		return 0, fmt.Errorf("pb marshall error %v", err)
@@ -64,7 +57,7 @@ func (db *Db) pbAppend(entity *pb.Entity) (int64, error) {
 }
 
 // Set a key-value pair in the database
-func (db *Db) Set(entity *pb.Entity) error {
+func (db *DB) Set(entity *pb.Entity) error {
 	offset, err := db.pbAppend(entity)
 	if err != nil {
 		return err
@@ -74,7 +67,7 @@ func (db *Db) Set(entity *pb.Entity) error {
 }
 
 // Delete an entry for given key from database
-func (db *Db) Delete(key string) error {
+func (db *DB) Delete(key string) error {
 	entity := &pb.Entity{Tombstone: true, Key: key}
 	offset, err := db.pbAppend(entity)
 	if err != nil {
@@ -85,7 +78,7 @@ func (db *Db) Delete(key string) error {
 }
 
 // Get a key-value pair from the database
-func (db *Db) Get(key string) (*pb.Entity, error) {
+func (db *DB) Get(key string) (*pb.Entity, error) {
 	offset, ok := db.offsetMap[key]
 	if !ok {
 		return nil, nil
@@ -108,7 +101,7 @@ func (db *Db) Get(key string) (*pb.Entity, error) {
 	return entity, nil
 }
 
-func (db *Db) readSize() (uint64, error) {
+func (db *DB) readSize() (uint64, error) {
 	intsize := 8
 	byteBuffer := make([]byte, intsize)
 	_, err := db.f.Read(byteBuffer)
@@ -125,7 +118,7 @@ func (db *Db) readSize() (uint64, error) {
 }
 
 // Recover from a crash and populate in-memory hashmap from existing file
-func (db *Db) Recover() error {
+func (db *DB) Recover() error {
 	// start reading file at beginning
 	offset := int64(0)
 	_, err := db.f.Seek(offset, 0)
@@ -154,7 +147,7 @@ func (db *Db) Recover() error {
 	return nil
 }
 
-func (db *Db) readPbData(lengthOf uint64) (*pb.Entity, error) {
+func (db *DB) readPbData(lengthOf uint64) (*pb.Entity, error) {
 	dataBuf := make([]byte, lengthOf)
 	_, err := db.f.Read(dataBuf)
 	if err != nil {

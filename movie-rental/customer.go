@@ -34,22 +34,23 @@ func (rcvr Customer) Name() string {
 }
 
 func (rental Rental) Charge() float64 {
-	result := 0.0
 	switch rental.Movie().PriceCode() {
 	case REGULAR:
-		result += 2
+		result := 2.0
 		if rental.DaysRented() > 2 {
 			result += float64(rental.DaysRented()-2) * 1.5
 		}
+		return result
 	case NEW_RELEASE:
-		result += float64(rental.DaysRented()) * 3.0
+		return float64(rental.DaysRented()) * 3.0
 	case CHILDRENS:
-		result += 1.5
+		result := 1.5
 		if rental.DaysRented() > 3 {
 			result += float64(rental.DaysRented()-3) * 1.5
 		}
+		return result
 	}
-	return result
+	return 0
 }
 
 func (rental Rental) GetPoint() int {

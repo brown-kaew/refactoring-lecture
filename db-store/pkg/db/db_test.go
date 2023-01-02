@@ -1,6 +1,7 @@
 package db
 
 import (
+	"io"
 	"os"
 	"reflect"
 	"testing"
@@ -8,7 +9,7 @@ import (
 	"github.com/brown-kaew/refactoring-lecture/db-store/pb"
 )
 
-func setup(t *testing.T) (*os.File, func()) {
+func setup(t *testing.T) (io.ReadWriteSeeker, func()) {
 	t.Parallel()
 	f, err := os.CreateTemp("", "dbstore")
 	if err != nil {

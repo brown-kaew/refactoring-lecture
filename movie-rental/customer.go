@@ -25,16 +25,16 @@ func NewCustomer(name string) Customer {
 		rentals: []Rental{},
 	}
 }
-func (rcvr Customer) AddRental(arg Rental) {
-	rcvr.rentals = append(rcvr.rentals, arg)
+func (c Customer) AddRental(arg Rental) {
+	c.rentals = append(c.rentals, arg)
 }
 
-func (rcvr Customer) Name() string {
-	return rcvr.name
+func (c Customer) Name() string {
+	return c.name
 }
 
 func (rental Rental) Charge() float64 {
-	return rental.Movie().Pricer.Charge(rental.DaysRented())
+	return rental.Movie().Charge(rental.DaysRented())
 }
 
 func (rental Rental) GetPoint() int {

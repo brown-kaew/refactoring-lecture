@@ -10,7 +10,7 @@ const (
 type Movie struct {
 	title     string
 	priceCode int
-	Pricer    Pricer
+	pricer    Pricer
 }
 
 type Pricer interface {
@@ -80,26 +80,26 @@ func CreateChildrens() Pricer {
 	}
 }
 
-func New(title string, pricer Pricer) Movie {
+func NewMovie(title string, pricer Pricer) Movie {
 	return Movie{
 		title:     title,
 		priceCode: pricer.PriceCode(),
-		Pricer:    pricer,
+		pricer:    pricer,
 	}
 }
 
-func NewMovie(title string, priceCode int) Movie {
-	return Movie{
-		title:     title,
-		priceCode: priceCode,
-	}
-}
 func (m Movie) PriceCode() int {
 	return m.priceCode
 }
+
 func (m Movie) Title() string {
 	return m.title
 }
+
 func (m Movie) SetPriceCode(arg int) {
 	m.priceCode = arg
+}
+
+func (m Movie) Charge(daysRented int) float64 {
+	return m.pricer.Charge(daysRented)
 }

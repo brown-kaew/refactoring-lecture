@@ -2,10 +2,14 @@ package db
 
 import "github.com/brown-kaew/refactoring-lecture/db-store/pb"
 
-type Storage interface {
+type SetGetDeleter interface {
 	Set(entity *pb.Entity) error
-	Delete(key string) error
 	Get(key string) (*pb.Entity, error)
+	Delete(key string) error
+}
+
+type Storage interface {
+	SetGetDeleter
 	Recover() error
 	Len() int
 }

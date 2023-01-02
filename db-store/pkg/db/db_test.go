@@ -2,23 +2,19 @@ package db
 
 import (
 	"io"
-	"os"
 	"reflect"
 	"testing"
 
 	"github.com/brown-kaew/refactoring-lecture/db-store/pb"
+	"github.com/mattetti/filebuffer"
 )
 
 func setup(t *testing.T) (io.ReadWriteSeeker, func()) {
 	t.Parallel()
-	f, err := os.CreateTemp("", "dbstore")
-	if err != nil {
-		t.Fatalf("error creating temp file: %v", err)
-	}
 
+	f := filebuffer.New(nil)
 	teardown := func() {
 		f.Close()
-		os.Remove(f.Name())
 	}
 
 	return f, teardown
